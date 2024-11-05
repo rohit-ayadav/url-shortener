@@ -46,8 +46,8 @@ const Modal = ({ isOpen, onClose, children, title }: {
 
     return (
         <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
-            <div className="bg-white rounded-lg w-full max-w-2xl">
-                <div className="flex justify-between items-center p-4 border-b">
+            <div className="bg-white rounded-lg w-full max-w-2xl shadow-lg">
+                <div className="flex justify-between items-center p-4 border-b border-gray-200">
                     <h2 className="text-xl font-semibold">{title}</h2>
                     <Button
                         variant="ghost"
@@ -58,7 +58,7 @@ const Modal = ({ isOpen, onClose, children, title }: {
                         <X className="h-5 w-5" />
                     </Button>
                 </div>
-                <div className="p-4">
+                <div className="p-6">
                     {children}
                 </div>
             </div>
@@ -104,7 +104,7 @@ export const UseCases = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => 
     return (
         <Modal isOpen={isOpen} onClose={onClose} title="Use Cases">
             <div className="space-y-4">
-                <div className="grid gap-4">
+                <div className="grid sm:grid-cols-2 gap-4">
                     <Card>
                         <CardHeader>
                             <CardTitle className="text-lg">Social Media Sharing</CardTitle>
@@ -176,22 +176,22 @@ export const Footer = () => {
 
     return (
         <footer className="mt-8 text-center pb-4">
-            <div className="flex justify-center space-x-4 text-sm text-blue-600">
+            <div className="flex justify-center space-x-4 text-sm text-blue-600 flex-wrap">
                 <button
                     onClick={() => setActiveModal('terms')}
-                    className="hover:text-blue-800 transition-colors"
+                    className="hover:text-blue-800 transition-colors px-4 py-2 rounded-md hover:bg-blue-50"
                 >
                     Terms of Use
                 </button>
                 <button
                     onClick={() => setActiveModal('useCases')}
-                    className="hover:text-blue-800 transition-colors"
+                    className="hover:text-blue-800 transition-colors px-4 py-2 rounded-md hover:bg-blue-50"
                 >
                     Use Cases
                 </button>
                 <button
                     onClick={() => setActiveModal('howTo')}
-                    className="hover:text-blue-800 transition-colors"
+                    className="hover:text-blue-800 transition-colors px-4 py-2 rounded-md hover:bg-blue-50"
                 >
                     How to Use
                 </button>
