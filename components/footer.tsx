@@ -3,9 +3,11 @@ import { X } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import toast from 'react-hot-toast';
 
 // API integration
 const API_URL = 'https://resourcesandcarrier.online/api/urlshortener';
+// const API_URL = 'http://localhost:3002/api/urlshortener';
 
 export const createShortUrl = async (originalUrl: string, alias: string) => {
     try {
@@ -15,17 +17,20 @@ export const createShortUrl = async (originalUrl: string, alias: string) => {
                 'Content-Type': 'application/json',
             },
             credentials: 'include',
-            body: JSON.stringify({ originalUrl, alias }),
+            body: JSON.stringify(alias ? { originalUrl, alias } : { originalUrl }),
         });
 
-        if (!response.ok) {
-            throw new Error('Failed to create short URL');
-        }
-
         const data = await response.json();
-        return data;
+        toast.success(`${data.message}`);
+        if (!response.ok) {
+            throw new Error(`Failed to create short URL: ${data.message}`);
+        }
+        console.log(`Shortened Url: ${data.shortenURL} and message: ${data.message}`);
+
+        return data.shortenURL;
     } catch (error) {
         console.error('Error creating short URL:', error);
+        toast.error(String(error));
         throw error;
     }
 };

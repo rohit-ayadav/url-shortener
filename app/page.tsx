@@ -19,6 +19,7 @@ import {
 } from "lucide-react";
 import Footer from '@/components/footer';
 import { createShortUrl } from '@/components/footer';
+import toast, { Toaster } from 'react-hot-toast';
 
 const URLShortener = () => {
   const [url, setUrl] = useState('');
@@ -53,13 +54,13 @@ const URLShortener = () => {
   const handleShortenSingle = async () => {
     if (!url) {
       setError('Please enter a URL');
+      toast.error('Please enter a URL');
       return;
     }
     if (!checkAlias(alias)) return;
 
     setLoading(true);
     try {
-      // Simulating API call
       const shortened = await createShortUrl(url, alias);
       setShortenedURLs([{ original: url, shortened }]);
       setError('');
@@ -73,7 +74,8 @@ const URLShortener = () => {
 
   const handleShortenMultiple = async () => {
     if (!urls) {
-      setError('Please enter URLs');
+      setError("Please enter lines of URLs...");
+      toast.error('Please enter lines of URLs...');
       return;
     }
     setLoading(true);
@@ -98,11 +100,11 @@ const URLShortener = () => {
   const handleProcessText = async () => {
     if (!text) {
       setError('Please enter text containing URLs');
+      toast.error('Please enter text containing URLs')
       return;
     }
     setLoading(true);
     try {
-      // Simple URL regex for demonstration
       const urlRegex = /(https?:\/\/[^\s]+)/g;
       let newText = text;
       const urls = text.match(urlRegex) || [];
@@ -114,7 +116,8 @@ const URLShortener = () => {
       shortened.forEach(({ original, shortened }) => {
         newText = newText.replace(original, shortened);
       });
-
+      await navigator.clipboard.writeText(newText);
+      toast.success('Text processed and copied to clipboard');
       setProcessedText(newText);
       setShortenedURLs(shortened);
       setError('');
@@ -197,141 +200,146 @@ const URLShortener = () => {
   );
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-50 p-4">
-      <div className="max-w-3xl mx-auto">
-        <Card className="shadow-lg border-0">
-          <CardHeader className="text-center pb-2">
-            <CardTitle className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
-              URL Shortener
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <Tabs defaultValue="single" className="space-y-4">
-              <TabsList className="grid w-full grid-cols-3">
-                <TabsTrigger value="single">Single URL</TabsTrigger>
-                <TabsTrigger value="multiple">Multiple URLs</TabsTrigger>
-                <TabsTrigger value="text">Text Mode</TabsTrigger>
-              </TabsList>
+    <>
+      <Toaster
+        position='top-right'
+      />
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-50 p-4">
+        <div className="max-w-3xl mx-auto">
+          <Card className="shadow-lg border-0">
+            <CardHeader className="text-center pb-2">
+              <CardTitle className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
+                URL Shortener
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <Tabs defaultValue="single" className="space-y-4">
+                <TabsList className="grid w-full grid-cols-3">
+                  <TabsTrigger value="single">Single URL</TabsTrigger>
+                  <TabsTrigger value="multiple">Multiple URLs</TabsTrigger>
+                  <TabsTrigger value="text">Text Mode</TabsTrigger>
+                </TabsList>
 
-              <TabsContent value="single" className="space-y-4">
-                <div className="space-y-3">
-                  <div className="relative">
-                    <div className="absolute inset-y-0 left-3 flex items-center">
-                      <Link className="h-4 w-4 text-gray-500" />
+                <TabsContent value="single" className="space-y-4">
+                  <div className="space-y-3">
+                    <div className="relative">
+                      <div className="absolute inset-y-0 left-3 flex items-center">
+                        <Link className="h-4 w-4 text-gray-500" />
+                      </div>
+                      <Input
+                        type="url"
+                        value={url}
+                        onChange={(e) => setUrl(e.target.value)}
+                        placeholder="Enter URL to shorten"
+                        className="pl-10"
+                      />
                     </div>
                     <Input
-                      type="url"
-                      value={url}
-                      onChange={(e) => setUrl(e.target.value)}
-                      placeholder="Enter URL to shorten"
-                      className="pl-10"
+                      value={alias}
+                      onChange={(e) => {
+                        setAlias(e.target.value);
+                        checkAlias(e.target.value);
+                      }}
+                      placeholder="Custom alias (optional)"
+                      className="focus:ring-2 focus:ring-blue-500"
                     />
+                    {aliasError && (
+                      <p className="text-sm text-red-500 flex items-center gap-1">
+                        <AlertCircle className="h-4 w-4" />
+                        {aliasError}
+                      </p>
+                    )}
+                    <Button
+                      onClick={handleShortenSingle}
+                      disabled={loading}
+                      className="w-full bg-blue-600 hover:bg-blue-700"
+                    >
+                      {loading ? (
+                        <Loader2 className="h-5 w-5 animate-spin" />
+                      ) : (
+                        'Shorten URL'
+                      )}
+                    </Button>
                   </div>
-                  <Input
-                    value={alias}
-                    onChange={(e) => {
-                      setAlias(e.target.value);
-                      checkAlias(e.target.value);
-                    }}
-                    placeholder="Custom alias (optional)"
-                    className="focus:ring-2 focus:ring-blue-500"
+                </TabsContent>
+
+                <TabsContent value="multiple" className="space-y-4">
+                  <Textarea
+                    value={urls}
+                    onChange={(e) => setUrls(e.target.value)}
+                    placeholder="Enter URLs (one per line)"
+                    rows={4}
                   />
-                  {aliasError && (
-                    <p className="text-sm text-red-500 flex items-center gap-1">
-                      <AlertCircle className="h-4 w-4" />
-                      {aliasError}
-                    </p>
-                  )}
                   <Button
-                    onClick={handleShortenSingle}
+                    onClick={handleShortenMultiple}
                     disabled={loading}
                     className="w-full bg-blue-600 hover:bg-blue-700"
                   >
                     {loading ? (
                       <Loader2 className="h-5 w-5 animate-spin" />
                     ) : (
-                      'Shorten URL'
+                      'Shorten All URLs'
                     )}
                   </Button>
-                </div>
-              </TabsContent>
+                </TabsContent>
 
-              <TabsContent value="multiple" className="space-y-4">
-                <Textarea
-                  value={urls}
-                  onChange={(e) => setUrls(e.target.value)}
-                  placeholder="Enter URLs (one per line)"
-                  rows={4}
-                />
-                <Button
-                  onClick={handleShortenMultiple}
-                  disabled={loading}
-                  className="w-full bg-blue-600 hover:bg-blue-700"
-                >
-                  {loading ? (
-                    <Loader2 className="h-5 w-5 animate-spin" />
-                  ) : (
-                    'Shorten All URLs'
-                  )}
-                </Button>
-              </TabsContent>
-
-              <TabsContent value="text" className="space-y-4">
-                <Textarea
-                  value={text}
-                  onChange={(e) => setText(e.target.value)}
-                  placeholder="Enter text containing URLs to shorten"
-                  rows={4}
-                />
-                <Button
-                  onClick={handleProcessText}
-                  disabled={loading}
-                  className="w-full bg-blue-600 hover:bg-blue-700"
-                >
-                  {loading ? (
-                    <Loader2 className="h-5 w-5 animate-spin" />
-                  ) : (
-                    'Process Text'
-                  )}
-                </Button>
-                {processedText && (
-                  <div className="mt-4 p-4 bg-gray-50 rounded-lg">
-                    <div className="flex justify-between items-center mb-2">
-                      <h3 className="text-sm font-medium text-gray-700">Processed Text</h3>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => handleCopy(processedText)}
-                        className="text-blue-600"
-                      >
-                        <Copy className="h-4 w-4 mr-2" />
-                        Copy
-                      </Button>
+                <TabsContent value="text" className="space-y-4">
+                  <Textarea
+                    value={text}
+                    onChange={(e) => setText(e.target.value)}
+                    placeholder="Enter text containing URLs to shorten"
+                    rows={4}
+                  />
+                  <Button
+                    onClick={handleProcessText}
+                    disabled={loading}
+                    className="w-full bg-blue-600 hover:bg-blue-700"
+                  >
+                    {loading ? (
+                      <Loader2 className="h-5 w-5 animate-spin" />
+                    ) : (
+                      'Process Text'
+                    )}
+                  </Button>
+                  {processedText && (
+                    <div className="mt-4 p-4 bg-gray-50 rounded-lg">
+                      <div className="flex justify-between items-center mb-2">
+                        <h3 className="text-sm font-medium text-gray-700">Processed Text</h3>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => handleCopy(processedText)}
+                          className="text-blue-600"
+                        >
+                          <Copy className="h-4 w-4 mr-2" />
+                          Copy
+                        </Button>
+                      </div>
+                      <p className="text-sm text-gray-600 whitespace-pre-wrap">{processedText}</p>
                     </div>
-                    <p className="text-sm text-gray-600 whitespace-pre-wrap">{processedText}</p>
+                  )}
+                </TabsContent>
+
+                {error && (
+                  <Alert variant="destructive">
+                    <AlertDescription>{error}</AlertDescription>
+                  </Alert>
+                )}
+
+                {shortenedURLs.length > 0 && (
+                  <div className="space-y-3 animate-in fade-in-50 duration-500">
+                    {shortenedURLs.map((item, index) => (
+                      <ResultCard key={index} item={item} />
+                    ))}
                   </div>
                 )}
-              </TabsContent>
-
-              {error && (
-                <Alert variant="destructive">
-                  <AlertDescription>{error}</AlertDescription>
-                </Alert>
-              )}
-
-              {shortenedURLs.length > 0 && (
-                <div className="space-y-3 animate-in fade-in-50 duration-500">
-                  {shortenedURLs.map((item, index) => (
-                    <ResultCard key={index} item={item} />
-                  ))}
-                </div>
-              )}
-            </Tabs>
-          </CardContent>
-        </Card>
-        <Footer />
+              </Tabs>
+            </CardContent>
+          </Card>
+          <Footer />
+        </div>
       </div>
-    </div>
+    </>
   );
 };
 
