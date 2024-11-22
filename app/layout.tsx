@@ -16,8 +16,11 @@ const geistMono = localFont({
 export const metadata: Metadata = {
   title: "URL Shortener",
   description: "A simple URL shortener",
-  // add manifest.json
   manifest: "/manifest.json",
+  themeColor: "#000000",
+  viewport: "width=device-width, initial-scale=1",
+  
+  
 };
 
 
