@@ -5,7 +5,6 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import toast from 'react-hot-toast';
 
-// API integration
 const API_URL = 'https://resourcesandcarrier.online/api/urlshortener';
 // const API_URL = 'http://localhost:3002/api/urlshortener';
 
@@ -173,7 +172,17 @@ export const HowToUse = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => 
 // Footer Component
 export const Footer = () => {
     const [activeModal, setActiveModal] = useState<'terms' | 'useCases' | 'howTo' | null>(null);
-
+    if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+            navigator.serviceWorker.register('/sw.js')
+                .then((registration) => {
+                    console.log('Service Worker registered successfully:', registration.scope);
+                })
+                .catch((error) => {
+                    console.log('Service Worker registration failed:', error);
+                });
+        });
+    }
     return (
         <footer className="mt-8 text-center pb-4">
             <div className="flex justify-center space-x-4 text-sm text-blue-600 flex-wrap">

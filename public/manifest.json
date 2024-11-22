@@ -1,0 +1,29 @@
+{
+    "name": "URL Shortener",
+    "short_name": "URLShort",
+    "description": "A powerful URL shortening tool with multiple shortening options",
+    "lang": "en",
+    "start_url": "/",
+    "display": "standalone",
+    "background_color": "#8b5cf6",
+    "theme_color": "#8b5cf6",
+    "orientation": "portrait-primary",
+    "icons": [
+        {
+            "src": "/android-chrome-192x192.png",
+            "sizes": "192x192",
+            "type": "image/png"
+        },
+        {
+            "src": "/android-chrome-512x512.png?version=1",
+            "sizes": "512x512",
+            "type": "image/png"
+        }
+    ],
+    "scope": "/",
+    "categories": [
+        "URL Shortener",
+        "Shorten URL",
+        "URL Shortening"
+    ]
+}
