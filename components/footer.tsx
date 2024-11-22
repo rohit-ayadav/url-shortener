@@ -172,7 +172,7 @@ export const HowToUse = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => 
 // Footer Component
 export const Footer = () => {
     const [activeModal, setActiveModal] = useState<'terms' | 'useCases' | 'howTo' | null>(null);
-    if ('serviceWorker' in navigator) {
+    if (typeof window !== 'undefined' && 'serviceWorker' in navigator) {
         window.addEventListener('load', () => {
             navigator.serviceWorker.register('/sw.js')
                 .then((registration) => {
