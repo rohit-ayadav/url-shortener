@@ -302,17 +302,34 @@ const URLShortener = () => {
                     placeholder="Enter text containing URLs to shorten"
                     rows={8}
                   />
-                  <Button
-                    onClick={handleProcessText}
-                    disabled={loading}
-                    className="w-full bg-blue-600 hover:bg-blue-700"
-                  >
-                    {loading ? (
-                      <Loader2 className="h-5 w-5 animate-spin" />
-                    ) : (
-                      'Process Text'
-                    )}
-                  </Button>
+
+                  <div className="flex justify-between items-center">
+                    <Button
+                      onClick={handleProcessText}
+                      disabled={loading}
+                      className="w-full bg-blue-600 hover:bg-blue-700"
+                    >
+                      {loading ? (
+                        <Loader2 className="h-5 w-5 animate-spin" />
+                      ) : (
+                        'Process Text'
+                      )}
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => {
+                        setText('');
+                        setProcessedText('');
+                        setShortenedURLs([]);
+                        setError('');
+                      }
+                      }
+                      className="text-blue-600"
+                    >
+                      Clear Text
+                    </Button>
+                  </div>
                   {processedText && (
                     <div className="mt-4 p-4 bg-gray-50 rounded-lg">
                       <div className="flex justify-between items-center mb-2">

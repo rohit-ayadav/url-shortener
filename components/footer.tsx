@@ -25,7 +25,7 @@ export const createShortUrl = async (originalUrl: string, alias: string) => {
         });
 
         const data = await response.json();
-        toast.success(`${data.message}`);
+        // toast.success(`${data.message}`);
         if (!response.ok) {
             throw new Error(`Failed to create short URL: ${data.message}`);
         }
