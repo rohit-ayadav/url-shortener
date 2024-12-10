@@ -12,7 +12,7 @@ export const createShortUrl = async (originalUrl: string, alias: string) => {
     // Check if user is connected to the internet before making the request
     if (!navigator.onLine) {
         toast.error('No internet connection. Please check your network settings.');
-        return;
+        throw new Error('No internet connection. Please check your network settings.');
     }
     try {
         const response = await fetch(API_URL, {

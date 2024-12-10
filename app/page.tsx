@@ -57,6 +57,10 @@ const URLShortener = () => {
       toast.error('Please enter a URL');
       return;
     }
+    if (!navigator.onLine) {
+      setError('No internet connection. Please check your network settings.');
+      return;
+    }
     if (!checkAlias(alias)) return;
 
     setLoading(true);
@@ -76,6 +80,10 @@ const URLShortener = () => {
     if (!urls) {
       setError("Please enter lines of URLs...");
       toast.error('Please enter lines of URLs...');
+      return;
+    }
+    if (!navigator.onLine) {
+      setError('No internet connection. Please check your network settings.');
       return;
     }
     setLoading(true);
@@ -101,6 +109,10 @@ const URLShortener = () => {
     if (!text) {
       setError('Please enter text containing URLs');
       toast.error('Please enter text containing URLs')
+      return;
+    }
+    if (!navigator.onLine) {
+      setError('No internet connection. Please check your network settings.');
       return;
     }
     setLoading(true);
@@ -288,7 +300,7 @@ const URLShortener = () => {
                     value={text}
                     onChange={(e) => setText(e.target.value)}
                     placeholder="Enter text containing URLs to shorten"
-                    rows={8} 
+                    rows={8}
                   />
                   <Button
                     onClick={handleProcessText}
