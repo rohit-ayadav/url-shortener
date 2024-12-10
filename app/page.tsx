@@ -268,7 +268,7 @@ const URLShortener = () => {
                     value={urls}
                     onChange={(e) => setUrls(e.target.value)}
                     placeholder="Enter URLs (one per line)"
-                    rows={4}
+                    rows={6}
                   />
                   <Button
                     onClick={handleShortenMultiple}
@@ -288,7 +288,7 @@ const URLShortener = () => {
                     value={text}
                     onChange={(e) => setText(e.target.value)}
                     placeholder="Enter text containing URLs to shorten"
-                    rows={4}
+                    rows={8} 
                   />
                   <Button
                     onClick={handleProcessText}

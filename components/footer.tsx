@@ -9,6 +9,11 @@ const API_URL = 'https://resourcesandcarrier.online/api/urlshortener';
 // const API_URL = 'http://localhost:3002/api/urlshortener';
 
 export const createShortUrl = async (originalUrl: string, alias: string) => {
+    // Check if user is connected to the internet before making the request
+    if (!navigator.onLine) {
+        toast.error('No internet connection. Please check your network settings.');
+        return;
+    }
     try {
         const response = await fetch(API_URL, {
             method: 'POST',
