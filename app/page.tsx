@@ -18,7 +18,7 @@ import {
   AlertCircle
 } from "lucide-react";
 import Footer from '@/components/footer';
-import { createShortUrl } from '@/components/footer';
+import createShortUrl from '@/components/createShortUrl';
 import toast, { Toaster } from 'react-hot-toast';
 
 const URLShortener = () => {
