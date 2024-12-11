@@ -43,13 +43,10 @@ const URLShortener = () => {
       setAliasError('Alias must be at least 4 characters');
       return false;
     }
-    if (!/^[a-zA-Z][a-zA-Z0-9_-]*$/.test(value)) {
-      setAliasError('Alias must start with a letter and contain only letters, numbers, hyphens, and underscores');
-      return false;
-    }
     setAliasError('');
     return true;
   };
+  const isValidURL = (str: string): boolean => { try { return !!new URL(str); } catch { return false; } };
 
   const handleShortenSingle = async () => {
     if (!url) {
@@ -57,11 +54,22 @@ const URLShortener = () => {
       toast.error('Please enter a URL');
       return;
     }
+    if (!isValidURL(url)) {
+      setError(`Please enter a valid URL`);
+      toast.error('Please enter a valid URL');
+      return;
+    }
     if (!navigator.onLine) {
       setError('No internet connection. Please check your network settings.');
       return;
     }
     if (!checkAlias(alias)) return;
+    setAlias(alias.trim());
+    setAlias(alias.toLowerCase());
+    setAlias(alias.replace(/[^a-z0-9]/g, '')); // remove special characters
+    setAlias(alias.replace(/\s/g, '-')); // replace spaces with hyphens
+    setAlias(alias.replace(/-+/g, '-')); // remove multiple hyphens
+    setAlias(alias.replace(/^-|-$/g, '')); // remove leading and trailing hyphens
 
     setLoading(true);
     try {
