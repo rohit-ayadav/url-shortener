@@ -39,7 +39,6 @@ const ModalWrapper = ({ isOpen, onClose, children, title, icon: Icon }: { isOpen
         </motion.div>
     );
 };
-
 export const Footer = () => {
     const [activeModal, setActiveModal] = useState<'terms' | 'useCases' | 'howTo' | 'about' | null>(null);
 
@@ -221,7 +220,6 @@ export const Footer = () => {
             )
         }
     };
-
     const renderModal = () => {
         if (!activeModal) return null;
         const { title, icon, content } = modalConfigs[activeModal];
@@ -239,21 +237,23 @@ export const Footer = () => {
     };
 
     return (
-        <footer className="bg-gray-100 dark:bg-gray-900 py-6 px-4 mt-8">
-            <div className="container mx-auto flex justify-center items-center space-x-4">
-                {Object.keys(modalConfigs).map((modal) => {
-                    const { icon: Icon } = modalConfigs[modal as keyof typeof modalConfigs];
-                    return (
-                        <button
-                            key={modal}
-                            onClick={() => setActiveModal(modal as any)}
-                            className="group flex items-center space-x-2 text-gray-600 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 transition-colors p-2 rounded-lg"
-                        >
-                            <Icon className="h-5 w-5 group-hover:scale-110 transition-transform" />
-                            <span className="text-sm font-medium capitalize">{modal}</span>
-                        </button>
-                    );
-                })}
+        <footer className="bg-gray-100 dark:bg-gray-900 py-4 px-4 bottom-0 w-full">
+            <div className="container mx-auto">
+                <div className="flex flex-col sm:flex-row justify-center items-center space-y-3 sm:space-y-0 sm:space-x-4">
+                    {Object.keys(modalConfigs).map((modal) => {
+                        const { icon: Icon } = modalConfigs[modal as keyof typeof modalConfigs];
+                        return (
+                            <button
+                                key={modal}
+                                onClick={() => setActiveModal(modal as any)}
+                                className="group flex items-center space-x-2 text-gray-600 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 transition-colors p-2 rounded-lg"
+                            >
+                                <Icon className="h-5 w-5 group-hover:scale-110 transition-transform" />
+                                <span className="text-sm font-medium capitalize">{modal}</span>
+                            </button>
+                        );
+                    })}
+                </div>
             </div>
 
             <AnimatePresence>
