@@ -170,11 +170,8 @@ const URLShortener = () => {
   };
 
   function cleanText(input: string): string {
-    // Remove everything before and including "Caption" or "caption"
     const cleanedCaption = input.replace(/^.*?Caption\s*.*?\n/, "").replace(/^.*?caption\s*.*?\n/, "");
-
     const finalOutput = cleanedCaption.replace(/^.*?usp=sharing\s*/s, "");
-
     return finalOutput.trim();
   }
 
