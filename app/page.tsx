@@ -67,12 +67,14 @@ const URLShortener = () => {
       return;
     }
     if (!checkAlias(alias)) return;
-    setAlias(alias.trim());
-    setAlias(alias.toLowerCase());
-    setAlias(alias.replace(/[^a-z0-9]/g, '')); // remove special characters
-    setAlias(alias.replace(/\s/g, '-')); // replace spaces with hyphens
-    setAlias(alias.replace(/-+/g, '-')); // remove multiple hyphens
-    setAlias(alias.replace(/^-|-$/g, '')); // remove leading and trailing hyphens
+    let transformedAlias = alias.trim();
+    transformedAlias = transformedAlias.toLowerCase();
+    transformedAlias = transformedAlias.replace(/\s/g, '-'); // replace spaces with hyphens
+    // transformedAlias = transformedAlias.replace(/[^a-z0-9]/g, ''); // remove special characters
+    transformedAlias = transformedAlias.replace(/-+/g, '-'); // remove multiple hyphens
+    transformedAlias = transformedAlias.replace(/^-|-$/g, ''); // remove leading and trailing hyphens
+
+    setAlias(transformedAlias);
 
     setLoading(true);
     try {
@@ -344,7 +346,7 @@ const URLShortener = () => {
                       )}
                     </Button>
                     <Button
-                      variant="link"
+                      variant="ghost"
                       size="sm"
                       onClick={() => pasteClipboard()}
                     >
