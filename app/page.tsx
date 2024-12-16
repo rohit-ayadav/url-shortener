@@ -15,7 +15,9 @@ import {
   Loader2,
   Text,
   LinkIcon,
-  AlertCircle
+  AlertCircle,
+  ClipboardCopy,
+  CircleX
 } from "lucide-react";
 import Footer from '@/components/footer';
 import createShortUrl from '@/components/createShortUrl';
@@ -29,6 +31,7 @@ const URLShortener = () => {
   const [processedText, setProcessedText] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [success, setSuccess] = useState('');
   const [shortenedURLs, setShortenedURLs] = useState<{ original: string; shortened: string }[]>([]);
   const [showQR, setShowQR] = useState(false);
   const [selectedURL, setSelectedURL] = useState<string | null>(null);
@@ -166,6 +169,26 @@ const URLShortener = () => {
     }
   };
 
+  function cleanText(input: string): string {
+    // Remove everything before and including "Caption" or "caption"
+    const cleanedCaption = input.replace(/^.*?Caption\s*.*?\n/, "").replace(/^.*?caption\s*.*?\n/, "");
+
+    const finalOutput = cleanedCaption.replace(/^.*?usp=sharing\s*/s, "");
+
+    return finalOutput.trim();
+  }
+
+  const pasteClipboard = async (): Promise<void> => {
+    const text = await navigator.clipboard.readText();
+    const cleanedText = cleanText(text);
+    setText(cleanedText);
+    // setSuccess for 3 second
+    setSuccess('Text pasted from clipboard');
+    setTimeout(() => setSuccess(''),
+      3000);
+
+
+  }
   const ResultCard = ({ item }: { item: { original: string; shortened: string } }) => (
     <div className="group p-4 bg-white rounded-lg shadow-sm hover:shadow-md transition-all duration-300 space-y-2 border border-gray-100">
       <div className="flex items-center space-x-2">
@@ -324,6 +347,13 @@ const URLShortener = () => {
                       )}
                     </Button>
                     <Button
+                      variant="link"
+                      size="sm"
+                      onClick={() => pasteClipboard()}
+                    >
+                      <ClipboardCopy className="h-5 w-5" />
+                    </Button>
+                    <Button
                       variant="ghost"
                       size="sm"
                       onClick={() => {
@@ -335,7 +365,7 @@ const URLShortener = () => {
                       }
                       className="text-blue-600"
                     >
-                      Clear Text
+                      <CircleX className='h-5 w-5' />
                     </Button>
                   </div>
                   {processedText && (
