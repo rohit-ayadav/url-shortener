@@ -3,11 +3,25 @@ import toast from 'react-hot-toast';
 const API_URL = 'https://resourcesandcarrier.online/api/urlshortener';
 // const API_URL = 'http://localhost:3002/api/urlshortener';
 
+
+const isValidAlias = (alias: string) => {
+    // Only alphanumeric characters along with hyphen and underscore
+    const regex = /^[a-zA-Z0-9_-]+$/;
+
+    return regex.test(alias);
+};
+
 const createShortUrl = async (originalUrl: string, alias: string) => {
     // Check if user is connected to the internet before making the request
     if (!navigator.onLine) {
         toast.error('No internet connection. Please check your network settings.');
         throw new Error('No internet connection. Please check your network settings.');
+    }
+    if (alias) {
+        if (!isValidAlias(alias)) {
+            toast.error('Invalid alias. Please use only alphanumeric characters.');
+            throw new Error('Invalid alias. Please use only alphanumeric characters.');
+        }
     }
     try {
         const response = await fetch(API_URL, {

@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Input } from "@/components/ui/input";
@@ -37,6 +37,30 @@ const URLShortener = () => {
   const [selectedURL, setSelectedURL] = useState<string | null>(null);
   const [aliasError, setAliasError] = useState('');
 
+  function AlertBox({ message }: { message: string }) {
+    return (
+      <Alert variant="destructive">
+        <AlertDescription>{message}</AlertDescription>
+      </Alert>
+    );
+  }
+
+  function formatAlias(alias: string): string {
+    let transformedAlias = alias.trim();
+    transformedAlias = transformedAlias.toLowerCase();
+    transformedAlias = transformedAlias.replace(/\s/g, '-'); // replace spaces with hyphens
+    // remove special characters except hyphens and underscores
+    transformedAlias = transformedAlias.replace(/[^a-z0-9-_]/g, '');
+    transformedAlias = transformedAlias.replace(/-+/g, '-'); // remove multiple hyphens
+    transformedAlias = transformedAlias.replace(/^-|-$/g, ''); // remove leading and trailing hyphens
+    // remove hyphens if alias is empty
+    if (!transformedAlias) transformedAlias = '';
+    // trim alias to 50 characters
+    if (transformedAlias.length > 50) transformedAlias = transformedAlias.slice(0, 50);
+    setAlias(transformedAlias); // set the transformed alias
+    return transformedAlias;
+  }
+
   const checkAlias = (value: string) => {
     if (!value) {
       setAliasError('');
@@ -46,12 +70,71 @@ const URLShortener = () => {
       setAliasError('Alias must be at least 4 characters');
       return false;
     }
+    if (value.length > 50) {
+      setAliasError('Alias must be less than 50 characters');
+      return false;
+    }
+
+    if (value.includes('/')) {
+      setAliasError('Alias cannot contain slashes');
+      return false;
+    }
+    if (value.includes('?')) {
+      setAliasError('Alias cannot contain question marks');
+      return false;
+    }
+    if (value.includes('#')) {
+      setAliasError('Alias cannot contain hash symbols');
+      return false;
+    }
+    if (value.includes('&')) {
+      setAliasError('Alias cannot contain ampersands');
+      return false;
+    }
+    if (value.includes('=')) {
+      setAliasError('Alias cannot contain equal signs');
+      return false;
+    }
+    if (value.includes('+')) {
+      setAliasError('Alias cannot contain plus signs');
+      return false;
+    }
+    if (value.includes('%')) {
+      setAliasError('Alias cannot contain percent signs');
+      return false;
+    }
+    // if alias is not empty, it must be alphanumeric along with hyphens and underscores
+    if (!/^[a-z0-9-_]+$/i.test(value)) {
+      setAliasError('Alias can only contain letters, numbers, hyphens, and underscores');
+      return false;
+    }
+
     setAliasError('');
     return true;
   };
+  useEffect(() => {
+    checkAlias(alias);
+    // formatAlias(alias) after 2 seconds of user inactivity
+    const timeout = setTimeout(() => {
+      formatAlias(alias);
+    }, 2000);
+    return () => clearTimeout(timeout);
+
+  }, [alias]);
+
   const isValidURL = (str: string): boolean => { try { return !!new URL(str); } catch { return false; } };
 
   const handleShortenSingle = async () => {
+
+    if (!navigator.onLine) {
+      setError('No internet connection. Please check your network settings.');
+      return;
+    }
+    formatAlias(alias);
+    if (aliasError) {
+      setError('Please fix the alias error before proceeding');
+      return;
+    }
     if (!url) {
       setError('Please enter a URL');
       toast.error('Please enter a URL');
@@ -62,20 +145,6 @@ const URLShortener = () => {
       toast.error('Please enter a valid URL');
       return;
     }
-    if (!navigator.onLine) {
-      setError('No internet connection. Please check your network settings.');
-      return;
-    }
-    if (!checkAlias(alias)) return;
-    let transformedAlias = alias.trim();
-    transformedAlias = transformedAlias.toLowerCase();
-    transformedAlias = transformedAlias.replace(/\s/g, '-'); // replace spaces with hyphens
-    // transformedAlias = transformedAlias.replace(/[^a-z0-9]/g, ''); // remove special characters
-    transformedAlias = transformedAlias.replace(/-+/g, '-'); // remove multiple hyphens
-    transformedAlias = transformedAlias.replace(/^-|-$/g, ''); // remove leading and trailing hyphens
-
-    setAlias(transformedAlias);
-
     setLoading(true);
     try {
       const shortened = await createShortUrl(url, alias);
@@ -280,7 +349,6 @@ const URLShortener = () => {
                       value={alias}
                       onChange={(e) => {
                         setAlias(e.target.value);
-                        checkAlias(e.target.value);
                       }}
                       placeholder="Custom alias (optional)"
                       className="focus:ring-2 focus:ring-blue-500"
