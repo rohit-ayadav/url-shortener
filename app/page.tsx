@@ -20,7 +20,7 @@ import {
   CircleX
 } from "lucide-react";
 import Footer from '@/components/footer';
-import createShortUrl from '@/components/createShortUrl';
+import { createShortUrl, getStats } from '@/components/createShortUrl';
 import toast, { Toaster } from 'react-hot-toast';
 
 const URLShortener = () => {
@@ -36,14 +36,17 @@ const URLShortener = () => {
   const [showQR, setShowQR] = useState(false);
   const [selectedURL, setSelectedURL] = useState<string | null>(null);
   const [aliasError, setAliasError] = useState('');
+  const [totalShortenedUrls, setTotalShortenedUrls] = useState(0);
+  const [totalClicks, setTotalClicks] = useState(0);
 
-  function AlertBox({ message }: { message: string }) {
-    return (
-      <Alert variant="destructive">
-        <AlertDescription>{message}</AlertDescription>
-      </Alert>
-    );
-  }
+  useEffect(() => {
+    const fetchStats = async () => {
+      const { totalShortenedUrls, totalClicks } = await getStats();
+      setTotalShortenedUrls(totalShortenedUrls);
+      setTotalClicks(totalClicks);
+    };
+    fetchStats();
+  }, []);
 
   function formatAlias(alias: string): string {
     let transformedAlias = alias.trim();
@@ -310,171 +313,192 @@ const URLShortener = () => {
     </div>
   );
 
-  return (
-    <>
-      <Toaster
-        position='top-right'
-      />
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-50 p-4">
-        <div className="max-w-3xl mx-auto">
-          <Card className="shadow-lg border-0">
-            <CardHeader className="text-center pb-2">
-              <CardTitle className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
-                URL Shortener
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <Tabs defaultValue="single" className="space-y-4">
-                <TabsList className="grid w-full grid-cols-3">
-                  <TabsTrigger value="single">Single URL</TabsTrigger>
-                  <TabsTrigger value="multiple">Multiple URLs</TabsTrigger>
-                  <TabsTrigger value="text">Text Mode</TabsTrigger>
-                </TabsList>
+  {showQR && selectedURL && (
+    <div className="fixed inset-0 z-50 bg-black bg-opacity-50 flex items-center justify-center">
+      <div className="bg-white p-4 rounded-lg shadow-lg max-w-md w-full">
+        <div className="flex justify-between items-center mb-4">
+          <h3 className="text-lg font-medium text-gray-700">QR Code</h3>
+          <Button
+            onClick={() => setShowQR(false)}
+            variant="ghost"
+            size="icon"
+            className="text-blue-600"
+          >
+            <CircleX className="h-5 w-5" />
+          </Button>
+        </div>
+        <div className="flex justify-center">
+          <img src={`https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${selectedURL}`} alt="QR Code" />
+        </div>
+      </div>
+    </div>
+  )}
 
-                <TabsContent value="single" className="space-y-4">
-                  <div className="space-y-3">
-                    <div className="relative">
-                      <div className="absolute inset-y-0 left-3 flex items-center">
-                        <Link className="h-4 w-4 text-gray-500" />
-                      </div>
-                      <Input
-                        type="url"
-                        value={url}
-                        onChange={(e) => setUrl(e.target.value)}
-                        placeholder="Enter URL to shorten"
-                        className="pl-10"
-                      />
+return (
+  <>
+    <Toaster
+      position='top-right'
+    />
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-50 p-4">
+      <div className="max-w-3xl mx-auto">
+        <Card className="shadow-lg border-0">
+          <CardHeader className="text-center pb-2">
+            <CardTitle className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
+              URL Shortener
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <Tabs defaultValue="single" className="space-y-4">
+              <TabsList className="grid w-full grid-cols-3">
+                <TabsTrigger value="single">Single URL</TabsTrigger>
+                <TabsTrigger value="multiple">Multiple URLs</TabsTrigger>
+                <TabsTrigger value="text">Text Mode</TabsTrigger>
+              </TabsList>
+
+              <TabsContent value="single" className="space-y-4">
+                <div className="space-y-3">
+                  <div className="relative">
+                    <div className="absolute inset-y-0 left-3 flex items-center">
+                      <Link className="h-4 w-4 text-gray-500" />
                     </div>
                     <Input
-                      value={alias}
-                      onChange={(e) => {
-                        setAlias(e.target.value);
-                      }}
-                      placeholder="Custom alias (optional)"
-                      className="focus:ring-2 focus:ring-blue-500"
+                      type="url"
+                      value={url}
+                      onChange={(e) => setUrl(e.target.value)}
+                      placeholder="Enter URL to shorten"
+                      className="pl-10"
                     />
-                    {aliasError && (
-                      <p className="text-sm text-red-500 flex items-center gap-1">
-                        <AlertCircle className="h-4 w-4" />
-                        {aliasError}
-                      </p>
-                    )}
-                    <Button
-                      onClick={handleShortenSingle}
-                      disabled={loading}
-                      className="w-full bg-blue-600 hover:bg-blue-700"
-                    >
-                      {loading ? (
-                        <Loader2 className="h-5 w-5 animate-spin" />
-                      ) : (
-                        'Shorten URL'
-                      )}
-                    </Button>
                   </div>
-                </TabsContent>
-
-                <TabsContent value="multiple" className="space-y-4">
-                  <Textarea
-                    value={urls}
-                    onChange={(e) => setUrls(e.target.value)}
-                    placeholder="Enter URLs (one per line)"
-                    rows={6}
+                  <Input
+                    value={alias}
+                    onChange={(e) => {
+                      setAlias(e.target.value);
+                    }}
+                    placeholder="Custom alias (optional)"
+                    className="focus:ring-2 focus:ring-blue-500"
                   />
+                  {aliasError && (
+                    <p className="text-sm text-red-500 flex items-center gap-1">
+                      <AlertCircle className="h-4 w-4" />
+                      {aliasError}
+                    </p>
+                  )}
                   <Button
-                    onClick={handleShortenMultiple}
+                    onClick={handleShortenSingle}
                     disabled={loading}
                     className="w-full bg-blue-600 hover:bg-blue-700"
                   >
                     {loading ? (
                       <Loader2 className="h-5 w-5 animate-spin" />
                     ) : (
-                      'Shorten All URLs'
+                      'Shorten URL'
                     )}
                   </Button>
-                </TabsContent>
+                </div>
+              </TabsContent>
 
-                <TabsContent value="text" className="space-y-4">
-                  <Textarea
-                    value={text}
-                    onChange={(e) => setText(e.target.value)}
-                    placeholder="Enter text containing URLs to shorten"
-                    rows={8}
-                  />
-
-                  <div className="flex justify-between items-center">
-                    <Button
-                      onClick={handleProcessText}
-                      disabled={loading}
-                      className="w-full bg-blue-600 hover:bg-blue-700"
-                    >
-                      {loading ? (
-                        <Loader2 className="h-5 w-5 animate-spin" />
-                      ) : (
-                        'Process Text'
-                      )}
-                    </Button>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => pasteClipboard()}
-                    >
-                      <ClipboardCopy className="h-5 w-5" />
-                    </Button>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => {
-                        setText('');
-                        setProcessedText('');
-                        setShortenedURLs([]);
-                        setError('');
-                      }
-                      }
-                      className="text-blue-600"
-                    >
-                      <CircleX className='h-5 w-5' />
-                    </Button>
-                  </div>
-                  {processedText && (
-                    <div className="mt-4 p-4 bg-gray-50 rounded-lg">
-                      <div className="flex justify-between items-center mb-2">
-                        <h3 className="text-sm font-medium text-gray-700">Processed Text</h3>
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => handleCopy(processedText)}
-                          className="text-blue-600"
-                        >
-                          <Copy className="h-4 w-4 mr-2" />
-                          Copy
-                        </Button>
-                      </div>
-                      <p className="text-sm text-gray-600 whitespace-pre-wrap">{processedText}</p>
-                    </div>
+              <TabsContent value="multiple" className="space-y-4">
+                <Textarea
+                  value={urls}
+                  onChange={(e) => setUrls(e.target.value)}
+                  placeholder="Enter URLs (one per line)"
+                  rows={6}
+                />
+                <Button
+                  onClick={handleShortenMultiple}
+                  disabled={loading}
+                  className="w-full bg-blue-600 hover:bg-blue-700"
+                >
+                  {loading ? (
+                    <Loader2 className="h-5 w-5 animate-spin" />
+                  ) : (
+                    'Shorten All URLs'
                   )}
-                </TabsContent>
+                </Button>
+              </TabsContent>
 
-                {error && (
-                  <Alert variant="destructive">
-                    <AlertDescription>{error}</AlertDescription>
-                  </Alert>
-                )}
+              <TabsContent value="text" className="space-y-4">
+                <Textarea
+                  value={text}
+                  onChange={(e) => setText(e.target.value)}
+                  placeholder="Enter text containing URLs to shorten"
+                  rows={8}
+                />
 
-                {shortenedURLs.length > 0 && (
-                  <div className="space-y-3 animate-in fade-in-50 duration-500">
-                    {shortenedURLs.map((item, index) => (
-                      <ResultCard key={index} item={item} />
-                    ))}
+                <div className="flex justify-between items-center">
+                  <Button
+                    onClick={handleProcessText}
+                    disabled={loading}
+                    className="w-full bg-blue-600 hover:bg-blue-700"
+                  >
+                    {loading ? (
+                      <Loader2 className="h-5 w-5 animate-spin" />
+                    ) : (
+                      'Process Text'
+                    )}
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => pasteClipboard()}
+                  >
+                    <ClipboardCopy className="h-5 w-5" />
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => {
+                      setText('');
+                      setProcessedText('');
+                      setShortenedURLs([]);
+                      setError('');
+                    }
+                    }
+                    className="text-blue-600"
+                  >
+                    <CircleX className='h-5 w-5' />
+                  </Button>
+                </div>
+                {processedText && (
+                  <div className="mt-4 p-4 bg-gray-50 rounded-lg">
+                    <div className="flex justify-between items-center mb-2">
+                      <h3 className="text-sm font-medium text-gray-700">Processed Text</h3>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => handleCopy(processedText)}
+                        className="text-blue-600"
+                      >
+                        <Copy className="h-4 w-4 mr-2" />
+                        Copy
+                      </Button>
+                    </div>
+                    <p className="text-sm text-gray-600 whitespace-pre-wrap">{processedText}</p>
                   </div>
                 )}
-              </Tabs>
-            </CardContent>
-          </Card>
-          <Footer />
-        </div>
+              </TabsContent>
+
+              {error && (
+                <Alert variant="destructive">
+                  <AlertDescription>{error}</AlertDescription>
+                </Alert>
+              )}
+
+              {shortenedURLs.length > 0 && (
+                <div className="space-y-3 animate-in fade-in-50 duration-500">
+                  {shortenedURLs.map((item, index) => (
+                    <ResultCard key={index} item={item} />
+                  ))}
+                </div>
+              )}
+            </Tabs>
+          </CardContent>
+        </Card>
+        <Footer />
       </div>
-    </>
-  );
+    </div>
+  </>
+);
 };
 
 export default URLShortener;

@@ -48,4 +48,26 @@ const createShortUrl = async (originalUrl: string, alias: string) => {
     }
 };
 
-export default createShortUrl;
+const getStats = async () => {
+    try {
+        const response = await fetch(API_URL, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            credentials: 'include',
+        });
+
+        const data = await response.json();
+        console.log(`Total Shortened Urls: ${data.totalShortenedUrls} and Total Clicks: ${data.totalClicks}`);
+        const totalShortenedUrls = data.totalShortenedUrls;
+        const totalClicks = data.totalClicks;
+        return { totalShortenedUrls, totalClicks };
+    } catch (error) {
+        console.error('Error getting stats:', error);
+        toast.error(String(error));
+        return { totalShortenedUrls: 0, totalClicks: 0 };
+    }
+};
+
+export { createShortUrl, getStats };
