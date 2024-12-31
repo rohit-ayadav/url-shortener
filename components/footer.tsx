@@ -46,7 +46,7 @@ export const Footer = () => {
     React.useEffect(() => {
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
-                navigator.serviceWorker.register('/sw.js')
+                navigator.serviceWorker.register('/sw.js?v=1.0.0')
                     .then((registration) => {
                         console.log('Service Worker registered successfully:', registration.scope);
                     })
