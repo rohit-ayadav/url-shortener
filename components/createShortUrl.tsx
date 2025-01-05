@@ -5,9 +5,7 @@ const API_URL = 'https://resourcesandcarrier.online/api/urlshortener';
 
 
 const isValidAlias = (alias: string) => {
-    // Only alphanumeric characters along with hyphen and underscore
     const regex = /^[a-zA-Z0-9_-]+$/;
-
     return regex.test(alias);
 };
 
@@ -60,7 +58,7 @@ const getStats = async () => {
 
         const data = await response.json();
         console.log(`Total Shortened Urls: ${data.totalShortenedUrls} and Total Clicks: ${data.totalClicks}`);
-        const totalShortenedUrls: number = parseInt(data.totalShortenedUrls);
+        const totalShortenedUrls = data.totalShortenedUrls;
         const totalClicks = data.totalClicks;
         return { totalShortenedUrls, totalClicks };
     } catch (error) {

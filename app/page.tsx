@@ -36,7 +36,7 @@ const URLShortener = () => {
   const [showQR, setShowQR] = useState(false);
   const [selectedURL, setSelectedURL] = useState<string | null>(null);
   const [aliasError, setAliasError] = useState('');
-  const [totalShortenedUrls, setTotalShortenedUrls] = useState(0);
+  const [totalShortenedUrls, setTotalShortenedUrls] = useState("0");
   const [totalClicks, setTotalClicks] = useState(0);
 
   useEffect(() => {
