@@ -22,6 +22,7 @@ import {
 import Footer from '@/components/footer';
 import { createShortUrl, getStats } from '@/components/createShortUrl';
 import toast, { Toaster } from 'react-hot-toast';
+import { Stats } from '@/components/stats';
 
 const URLShortener = () => {
   const [url, setUrl] = useState('');
@@ -36,7 +37,7 @@ const URLShortener = () => {
   const [showQR, setShowQR] = useState(false);
   const [selectedURL, setSelectedURL] = useState<string | null>(null);
   const [aliasError, setAliasError] = useState('');
-  const [totalShortenedUrls, setTotalShortenedUrls] = useState("0");
+  const [totalShortenedUrls, setTotalShortenedUrls] = useState(0);
   const [totalClicks, setTotalClicks] = useState(0);
 
   useEffect(() => {
@@ -495,10 +496,10 @@ const URLShortener = () => {
                 )}
               </Tabs>
             </CardContent>
-            <div className="mt-6 p-4 bg-white rounded-lg shadow-md text-center">
-              <p className="text-lg font-semibold text-gray-700"></p>
-              We have shortened <span className="text-blue-600">{totalShortenedUrls}</span> URLs with a total of <span className="text-blue-600">{totalClicks}</span> clicks!
-            </div>
+            <Stats
+              totalShortenedUrls={totalShortenedUrls}
+              totalClicks={totalClicks}
+            />
           </Card>
         </div>
         <Footer />
