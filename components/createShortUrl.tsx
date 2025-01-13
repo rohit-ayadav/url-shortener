@@ -58,7 +58,7 @@ const getStats = async () => {
 
         const data = await response.json();
         console.log(`Total Shortened Urls: ${data.totalShortenedUrls} and Total Clicks: ${data.totalClicks}`);
-        const totalShortenedUrls = data.totalShortenedUrls;
+        const totalShortenedUrls = data.totalShortenedURLs;
         const totalClicks = data.totalClicks;
         return { totalShortenedUrls, totalClicks };
     } catch (error) {
